@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace Silk.Core
+namespace Silk.Core.Responses
 {
     public class StringResponse : IHttpResponse
     {

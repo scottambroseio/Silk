@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Silk.Core.Attributes;
@@ -20,6 +21,14 @@ namespace Silk.Core
 
                 if (string.Equals(path, route, StringComparison.CurrentCultureIgnoreCase))
                 {
+                    var ctor = typeof(T).GetConstructors(BindingFlags.Public);
+                    foreach (var param in ctor.First().GetParameters())
+                    {
+                        Console.WriteLine(string.Format(
+                            "Param {0} is named {1} and is of type {2}",
+                            param.Position, param.Name, param.ParameterType));
+                    }
+
                     var handler = Activator.CreateInstance<T>();
 
                     var result = await handler.ExecuteAsync(context);
