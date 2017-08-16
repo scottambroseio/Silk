@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
+using Silk.Core.Attributes;
 
 namespace Silk.Core
 {
@@ -9,13 +11,25 @@ namespace Silk.Core
         {
             if (app == null) throw new ArgumentNullException(nameof(app));
 
-            app.Run(async context =>
+            app.Use(async (context, next) =>
             {
-                var handler = Activator.CreateInstance<T>();
+                var route = typeof(T).GetTypeInfo().GetCustomAttribute<RouteAttribute>()?.Pattern ??
+                            throw new Exception($"{typeof(T).Name} must have a route defined");
 
-                var result = await handler.ExecuteAsync(context);
+                var path = context.Request.Path;
 
-                await result.ExecuteAsync();
+                if (string.Equals(path, route, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    var handler = Activator.CreateInstance<T>();
+
+                    var result = await handler.ExecuteAsync(context);
+
+                    await result.ExecuteAsync();
+                }
+                else
+                {
+                    await next();
+                }
             });
         }
     }

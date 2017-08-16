@@ -25,6 +25,7 @@ namespace Silk.Example
             loggerFactory.AddConsole();
 
             app.RegisterHandler<IndexHandler>();
+            app.RegisterHandler<FooHandler>();
         }
     }
 }
